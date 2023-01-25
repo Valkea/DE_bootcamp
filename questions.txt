@@ -1,0 +1,54 @@
+
+Q1 - Knowing docker tags - Which tag has the following text? "Write the image ID to the file"
+
+The answer is: --iidfile string
+
+Q2 - Understanding docker first run  - How many python packages/modules are installed?
+
+>> docker run -it python:3.9 bash
+root@a009d00288b4:/# pip list
+Package    Version
+---------- -------
+pip        22.0.4
+setuptools 58.1.0
+wheel      0.38.4
+
+The answer is: 3
+
+Q3 - Count records  - How many taxi trips were totally made on January 15?
+
+SELECT * 
+FROM green_taxi_data 
+WHERE lpep_pickup_datetime >= '2019-01-15 00:00:00'::date 
+AND lpep_dropoff_datetime < '2019-01-16 00:00:00'::date  
+
+The answer is: 20530
+
+Q4 - Largest trip for each day - œWhich was the day with the largest trip distance?
+
+SELECT trip_distance, lpep_pickup_datetime
+FROM green_taxi_data
+ORDER BY trip_distance DESC
+LIMIT 1
+
+The answer is: 2019-01-15
+
+Q5 - The number of passengers - In 2019-01-01 how many trips had 2 and 3 passengers?
+
+SELECT passenger_count, COUNT(1)
+FROM green_taxi_data
+WHERE CAST(lpep_pickup_datetime AS DATE) = '2019-01-01'::date AND passenger_count IN (2,3)
+GROUP BY passenger_count
+
+The answer is: 2 = 1282 ; 3 = 254
+
+Q6 - Largest tip - For the passengers picked up in the Astoria Zone which was the drop up zone that had the largest tip?
+
+SELECT t1."tip_amount", t2."Zone", t1."PULocationID", t3."Zone", t1."DOLocationID"
+FROM green_taxi_data as t1
+LEFT JOIN zones as t2 ON t1."PULocationID" = t2."LocationID"
+LEFT JOIN zones as t3 ON t1."DOLocationID" = t3."LocationID"
+WHERE t2."Zone" = 'Astoria'
+ORDER BY t1."tip_amount" DESC
+
+The answer is: Long Island City/Queens Plaza

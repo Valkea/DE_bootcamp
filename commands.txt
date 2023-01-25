@@ -1,0 +1,114 @@
+# Build & run le Dockerfile local
+
+docker build -t test:pandas .
+docker run -it test:pandas
+
+# Run une image de postgres que l'on prend sur Gitub
+# puis config necessaire pour save les données dans un dossier local
+
+docker run -it \
+ -e POSTGRES_USER="root" \
+ -e POSTGRES_PASSWORD="root" \
+ -e POSTGRES_DB="ny_taxi" \
+ -v $(pwd)/ny_taxi_postgres_data:/var/lib/postgresql/data \
+ -p 5432:5432 \  #HOST:CONTAINER
+ postgres:13
+
+
+# On peut lancer pgadmin via une image docker (ça évite de l'installer)
+# https://hub.docker.com/r/dpage/pgadmin4/
+
+docker run -it \
+ -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+ -e PGADMIN_DEFAULT_PASSWORD="root" \
+ -p 8080:80 \
+ dpage/pgadmin4
+
+# GO TO >>> http://localhost:8080 avec les email & pass ci-dessus
+# Servers / create server
+# Ten use the postgresql config infos to configure the server
+
+
+# Le problème c'est que là, les deux ne peuvent pas se parler car ils ne sont pas sur le même network...
+# Donc on va en créer un et les relancer avec un parametre network
+
+docker network create pgsql-network
+
+docker run -it \
+ -e POSTGRES_USER="root" \
+ -e POSTGRES_PASSWORD="root" \
+ -e POSTGRES_DB="ny_taxi" \
+ -v $(pwd)/ny_taxi_postgres_data:/var/lib/postgresql/data \
+ -p 5432:5432 \  #HOST:CONTAINER
+ --network=pgsql-network \
+ --name pgsql-database \
+ postgres:13
+
+docker run -it \
+ -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+ -e PGADMIN_DEFAULT_PASSWORD="root" \
+ -p 8080:80 \
+ --network=pgsql-network \
+ dpage/pgadmin4
+
+# If needed, we can remove the previous network names with the following command
+docker rm pgsql-database
+# ou relancer la précedente commande avec 'docker start' au lieu de 'docker run'
+
+
+
+# Push a CSV file to a postgresql table using our script
+python ingest_data.py \
+ --user 'root' \
+ --password 'root' \
+ --host 'localhost' \
+ --port '5432' \
+ --db 'ny_taxi' \
+ --table 'green_taxi_data' \
+ --csv_url "green_tripdata_2019-01.csv"
+
+
+# Construisons une image docker avec ce script
+
+docker build -t taxi_ingest:v001 .
+
+# Et on le lance avec les même parametre (avec un réseau docker pour pouvoir se connecter dessus)
+
+docker run -ti \
+ --network=pgsql-network \
+ taxi_ingest:v001 \
+  --user root \
+  --password root \
+  --host pgsql-database \ # nom de network pour l'image docker postgres:13
+  --port 5432 \
+  --db ny_taxi \
+  --table green_taxi_data \
+  --csv_url "http://172.18.0.1:8000/green_tripdata_2019-01.csv" # faire tourner un serveur local avec python -m http.server
+
+
+## On peut rassembler les deux containers en un seul service via docker-compose
+
+# docker-compose.yaml
+services:
+        pgdatabase:
+                image: postgres:13
+                environment: 
+                        - POSTGRES_USER=root
+                        - POSTGRES_PASSWORD=root
+                        - POSTGRES_DB=ny_taxi
+                volumes:
+                        - "./ny_taxi_postgres_data:/var/lib/postgresql/data:rw"
+                ports:
+                        - "5432:5432"
+        pgadmin:
+                image: dpage/pgadmin4
+                environment:
+                        - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+                        - PGADMIN_DEFAULT_PASSWORD=root
+                ports:
+                        - "8080:80"
+
+# puis ensuite on lance le tout
+docker-compose up -d # pour lancer
+docker-compose ps # pour voir ce qui tourne
+docker-compote down # pour stopper

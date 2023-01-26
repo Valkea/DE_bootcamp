@@ -64,5 +64,13 @@ gcloud auth application-default login
 
 --> Configure variables.tf
 
+## Use Terraform
 
-Data Lake VS Data Warehouse
+terraform init
+
+terraform apply
+
+terraform destroy
+
+
+Q: Data Lake VS Data Warehouse

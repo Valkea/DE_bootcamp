@@ -9,14 +9,14 @@ terraform --version
 # Google cloud
 
 #GCD-UI# Create a new project
-project name -> dt-dew1
-project id -> optical-metric-375915
+project name -> PROJECT-NAME
+project id -> PROJECT-ID
 
-#GCD-UI# Switch to the project "dt-dew1"
+#GCD-UI# Switch to the project "PROJECT-NAME"
 #GCD-UI# Go to "IAM & Admin" / "Service Account"
 #GCD-UI# Go to "Create service account"
 
---> service account-name: dt-dew1-user
+--> service account-name: PROJECT-NAME-user
 --> role: basic / viewer
 --> Done
 
@@ -38,7 +38,7 @@ gcloud -v
 
 # Set environment variable for CGP authkey (the one we just created and exported as a JSON file)
 
-export GOOGLE_APPLICATION_CREDENTIALS=optical-metric-375915-bf9d00c6dd86.json
+export GOOGLE_APPLICATION_CREDENTIALS=My_Exported_File.json
 
 gcloud auth application-default login
 

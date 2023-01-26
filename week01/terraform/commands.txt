@@ -16,8 +16,9 @@ project id -> PROJECT-ID
 #GCD-UI# Go to "IAM & Admin" / "Service Account"
 #GCD-UI# Go to "Create service account"
 
---> service account-name: PROJECT-NAME-user
---> role: basic / viewer
+-->1/ service account-name: PROJECT-NAME-user
+-->2/ role: basic / viewer
+-->3/ .
 --> Done
 
 #GCD-UI# Once the service account is created we can click '...' and "Manage keys"

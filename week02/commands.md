@@ -12,4 +12,4 @@ prefect version
 ### create a flow function to organize the tasks (let's use the main function)
 ### create a task function (let's convert the ingest function) 
 
-
+### Split the original function into ETL (Extract, Transform, Load) steps

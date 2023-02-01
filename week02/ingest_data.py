@@ -1,48 +1,65 @@
 import os
-import sys
 import time
+import math
 import argparse
+from datetime import timedelta
 
 import pandas as pd
 from sqlalchemy import create_engine
 from prefect import flow, task
+from prefect.tasks import task_input_hash
 
 
-@task(name="Ingest function", log_prints=True, retries=3)
-def ingest(args):
 
-    if args.csv_url.endswith('.csv.gz'):
+@task(name="Extract Data", log_prints=True, retries=3, cache_key_fn=task_input_hash, cache_expiration=timedelta(days=1))
+def extract_data(url):
+    if url.endswith('.csv.gz'):
         output_file = "output.csv.gz"
     else:
         output_file = "output.csv"
 
-    os.system(f"wget {args.csv_url} -O {output_file}")
+    os.system(f"wget {url} -O {output_file}")
+
+    df = pd.read_csv(output_file)
+    return df
+
+
+@task(name="Transform Data", log_prints=True)
+def transform_data(df):
+
+    print(f"pre: columns types: \n{df.dtypes}")
+    df.lpep_pickup_datetime = pd.to_datetime(df.lpep_pickup_datetime)
+    df.lpep_dropoff_datetime = pd.to_datetime(df.lpep_dropoff_datetime)
+    print(f"post: columns types: \n{df.dtypes}")
+
+    print(f"pre: missing passenger count: {df[df.passenger_count == 0].shape[0]} / {df.shape[0]}")
+    df = df[df.passenger_count != 0]
+    print(f"post: missing passenger count: {df[df.passenger_count == 0].shape[0]} / {df.shape[0]}")
+    return df
+
+
+@task(name="Load Data into DB", log_prints=True, retries=3)
+def ingest(df, args):
 
     engine = create_engine(f'postgresql://{args.user}:{args.password}@{args.host}:{args.port}/{args.db}')
 
-    # Create table with columns
-    print(f"Create / Replace table {args.table} in DB {args.db}")
-
-    dt = pd.read_csv(output_file)
-    dt.lpep_pickup_datetime = pd.to_datetime(dt.lpep_pickup_datetime)
-    dt.lpep_dropoff_datetime = pd.to_datetime(dt.lpep_dropoff_datetime)
-
-    dt.head(n=0).to_sql(name=args.table, con=engine, if_exists='replace')
+    print("Create the table")
+    df.head(n=0).to_sql(name=args.table, con=engine, if_exists='replace')
 
     # Fill the table with the rows
-    print("Start inseting data")
+    print("Start inserting data")
 
-    df_iter = pd.read_csv(output_file, iterator=True, chunksize=100000)
+    step_size = 100000
+    for i in range(0, math.ceil(df.shape[0] / step_size)):
 
-    for chunk in df_iter:
-
+        start = i * step_size
+        end = min((i + 1) * step_size, df.shape[0])
         t0 = time.time()
 
-        chunk.lpep_pickup_datetime = pd.to_datetime(chunk.lpep_pickup_datetime)
-        chunk.lpep_dropoff_datetime = pd.to_datetime(chunk.lpep_dropoff_datetime)
+        chunk = df.iloc[start: end]
         chunk.to_sql(name=args.table, con=engine, if_exists='append')
 
-        print(f"inserted another chunk ({len(chunk)})... took {time.time()-t0} secondes")
+        print(f"Inserted another chunk ({chunk.shape[0]})... took {time.time()-t0} secondes")
 
 
 @flow(name='Ingest Flow')
@@ -69,7 +86,9 @@ def main_flow():
     args.csv_url = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-01.csv.gz'
     # / TMP ?
 
-    ingest(args)
+    raw_data = extract_data(args.csv_url)
+    trans_data = transform_data(raw_data)
+    ingest(trans_data, args)
 
 
 if __name__ == "__main__":

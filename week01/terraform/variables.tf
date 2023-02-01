@@ -4,6 +4,7 @@ locals {
 
 variable "project" {
   description = "Your GCP Project ID"
+  default = "lexical-passkey-375922"
 }
 
 variable "region" {

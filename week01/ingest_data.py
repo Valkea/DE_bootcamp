@@ -7,7 +7,11 @@ import argparse
 
 def main(args):
 
-    output_file = "output.csv"
+    if args.csv_url.endswith('.csv.gz'):
+        output_file = "output.csv.gz"
+    else:
+        output_file = "output.csv"
+
     os.system(f"wget {args.csv_url} -O {output_file}")
 
     engine = create_engine(f'postgresql://{args.user}:{args.password}@{args.host}:{args.port}/{args.db}')

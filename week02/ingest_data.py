@@ -1,11 +1,15 @@
 import os
-import pandas as pd
-from sqlalchemy import create_engine
+import sys
 import time
 import argparse
 
+import pandas as pd
+from sqlalchemy import create_engine
+from prefect import flow, task
 
-def main(args):
+
+@task(name="Ingest function", log_prints=True, retries=3)
+def ingest(args):
 
     if args.csv_url.endswith('.csv.gz'):
         output_file = "output.csv.gz"
@@ -41,7 +45,8 @@ def main(args):
         print(f"inserted another chunk ({len(chunk)})... took {time.time()-t0} secondes")
 
 
-if __name__ == "__main__":
+@flow(name='Ingest Flow')
+def main_flow():
 
     parser = argparse.ArgumentParser()
     # parser.add_argument("--user", help="user name for postgres")
@@ -64,4 +69,8 @@ if __name__ == "__main__":
     args.csv_url = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-01.csv.gz'
     # / TMP ?
 
-    main(args)
+    ingest(args)
+
+
+if __name__ == "__main__":
+    main_flow()

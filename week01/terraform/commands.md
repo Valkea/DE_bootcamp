@@ -71,6 +71,3 @@ terraform init
 terraform apply
 
 terraform destroy
-
-
-Q: Data Lake VS Data Warehouse

@@ -5,7 +5,6 @@ import argparse
 from datetime import timedelta
 
 import pandas as pd
-# from sqlalchemy import create_engine
 
 from prefect import flow, task
 from prefect.tasks import task_input_hash
@@ -43,7 +42,6 @@ def transform_data(df):
 @task(name="Load Data into DB", log_prints=True, retries=3)
 def ingest(df, table):
 
-    # engine = create_engine(f'postgresql://{args.user}:{args.password}@{args.host}:{args.port}/{args.db}')
     database_block = SqlAlchemyConnector.load("ny-taxi-postgres-connector")
     with database_block.get_connection(begin=False) as engine:
 
@@ -70,22 +68,11 @@ def ingest(df, table):
 def main_flow():
 
     parser = argparse.ArgumentParser()
-    # parser.add_argument("--user", help="user name for postgres")
-    # parser.add_argument("--password", help="password for postgres")
-    # parser.add_argument("--host", help="host for postgres")
-    # parser.add_argument("--port", help="port for postgres")
-    # parser.add_argument("--db", help="database name for postgres")
     # parser.add_argument("--table", help="the name of the table to fill with the CSV")
     # parser.add_argument("--csv_url", help="the url to the csv file")
-
     args = parser.parse_args()
 
     # TMP ?
-    # args.user = 'root'
-    # args.password = 'root'
-    # args.host = 'localhost'
-    # args.port = '5432'
-    # args.db = 'ny_taxi'
     args.table = 'green_taxi_data'
     args.csv_url = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-01.csv.gz'
     # / TMP ?

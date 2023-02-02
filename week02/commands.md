@@ -13,3 +13,11 @@ prefect version
 ### create a task function (let's convert the ingest function) 
 
 ### Split the original function into ETL (Extract, Transform, Load) steps
+
+
+## Run PREFECT GUI
+
+prefect orion start
+
+### open http://127.0.0.1:4200/
+

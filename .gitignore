@@ -1,1 +1,7 @@
 week01/terraform/gcp-passkey.json
+*.swp
+*.swo
+*.backup
+*.ipynb_checkpoints
+venvWeek02
+venv

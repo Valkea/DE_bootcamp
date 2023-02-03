@@ -34,13 +34,9 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     df.lpep_dropoff_datetime = pd.to_datetime(df.lpep_dropoff_datetime)
     print(f"post: columns types: \n{df.dtypes}")
 
-    print(
-        f"pre: missing passenger count: {df[df.passenger_count == 0].shape[0]} / {df.shape[0]}"
-    )
-    df = df[df.passenger_count != 0]
-    print(
-        f"post: missing passenger count: {df[df.passenger_count == 0].shape[0]} / {df.shape[0]}"
-    )
+    # print(f"pre: missing passenger count: {df[df.passenger_count == 0].shape[0]} / {df.shape[0]}")
+    # df = df[df.passenger_count != 0]
+    # print(f"post: missing passenger count: {df[df.passenger_count == 0].shape[0]} / {df.shape[0]}")
 
     return df
 
@@ -69,7 +65,7 @@ def etl_web_to_gcs() -> None:
 
     print("ETL_WEB_TO_GCS")
     color = "green"
-    year = 2021
+    year = 2020
     month = 1
     dataset_file = f"{color}_tripdata_{year}-{month:02}.csv.gz"
     dataset_url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{color}/{dataset_file}"

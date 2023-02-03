@@ -102,3 +102,24 @@ service account info --> copy the content of the JSON file associated with the b
 
 ### Edit script
 ==> Add GcsBucket (as explained on the PREFECT-GUI GcSBucket block page)
+
+#--------------------------------------------------------------
+# Move the GCS files to BigQuery Data Warehouse
+
+we write a whole new script (see etl_gcs_to_bq.py in 02_gcp)
+
+## GCP-UI ## "Big Query" / "Add data" / "Google Cloud Storage"
+
+--> Browse to "week02_02_gcp_bucket/data/green_tripdata_2020-01.parquet"
+--> Project : lexical-passkey-375922
+--> Dataset : create a new one with "dezoomcamp_dataset_us" and select it
+--> Table : taxi-rides
+--> Click CREATE TABLE
+
+## Edit script
+==> Add df.to_gbd (google big query) call
+==> Use the GcpCredentials defined earlier (go to GcpCredentials block on Orion and copy code there)
+
+
+
+WHAT is EXACTLY BIG QUERY?

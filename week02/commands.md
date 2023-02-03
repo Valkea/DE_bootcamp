@@ -49,7 +49,7 @@ port --> 5432
 ==> Add SqlAlchemyConnector instead (as explained on the PREFECT-GUI SqLAlchemy block page)
 
 
-#--------------------------------------------------------------
+# --------------------------------------------------------------
 # Do ETL and then send the resulting file to Google Cloud Storage (gcs)
 
 we write a whole new script (see 02_gcp)
@@ -103,7 +103,7 @@ service account info --> copy the content of the JSON file associated with the b
 ### Edit script
 ==> Add GcsBucket (as explained on the PREFECT-GUI GcSBucket block page)
 
-#--------------------------------------------------------------
+# --------------------------------------------------------------
 # Move the GCS files to BigQuery Data Warehouse
 
 we write a whole new script (see etl_gcs_to_bq.py in 02_gcp)
@@ -121,9 +121,42 @@ we write a whole new script (see etl_gcs_to_bq.py in 02_gcp)
 ==> Use the GcpCredentials defined earlier (go to GcpCredentials block on Orion and copy code there)
 
 
->### WHAT is **BIG QUERY**?
+> ### WHAT is **BIG QUERY**?
 > BigQuery is a fully managed enterprise **data warehouse** that helps you manage and analyze your data with **built-in features** like *machine learning, geospatial analysis, and business intelligence*.
 > 
 > BigQuery's **serverless architecture** lets you use **SQL queries** to answer your organization's biggest questions with zero infrastructure management.
 > 
 > BigQuery's scalable, distributed analysis engine **lets you query terabytes in seconds and petabytes in minutes**.
+
+
+
+# --------------------------------------------------------------
+# Add parameterization to PREFECT scripts
+
+Pass parameters to the main function of the script and the parameters will be detected by PREFECT.
+
+## PREFECT Deployment
+Such a deployment can be used with Docker, Kubernetes, etc...
+
+### Let's create the deployment .yaml file (we can edit the yaml if needed)
+>>> prefect deployment build ./etl_web_to_gcs.py:etl_parent_flow -n "Parameterized ETL"
+
+### Let's add some default parameter values.
+---> Edit the .yaml file and replace parameters: {}
+with parameters: {"color":"green", "months":[1,2,3], "year":2020}
+
+### Let's apply the modifications
+>>> prefect deployment apply etl_parent_flow-deployment.yaml 
+
+### Deployment using Orion CLI
+Go to Deployments and now there should be our deployment listed.
+There we can edit the deployement, manually add it to the agent scheduler with default parameters (Quick run) or with special parameters (Custom run), etc.
+
+### Let' trigger the deployment
+Using the Orion GUI, add a "Quick run" on the deployment. It will appear as scheduled (ready to run), but it won't run until an **agent** takes it in charge.
+
+### Let's run the agent (very light python process // cronjob)
+>>> prefect agent start --work-queue "default"
+
+
+### Deployment using terminal commands

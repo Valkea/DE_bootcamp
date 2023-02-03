@@ -121,5 +121,9 @@ we write a whole new script (see etl_gcs_to_bq.py in 02_gcp)
 ==> Use the GcpCredentials defined earlier (go to GcpCredentials block on Orion and copy code there)
 
 
-
-WHAT is EXACTLY BIG QUERY?
+>### WHAT is **BIG QUERY**?
+> BigQuery is a fully managed enterprise **data warehouse** that helps you manage and analyze your data with **built-in features** like *machine learning, geospatial analysis, and business intelligence*.
+> 
+> BigQuery's **serverless architecture** lets you use **SQL queries** to answer your organization's biggest questions with zero infrastructure management.
+> 
+> BigQuery's scalable, distributed analysis engine **lets you query terabytes in seconds and petabytes in minutes**.

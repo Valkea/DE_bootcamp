@@ -53,22 +53,26 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
 def write_local(df: pd.DataFrame, dataset_file: str) -> pathlib.Path:
     """Write the DataFrame out locally as a Parquet file"""
 
-    path = pathlib.Path("data")
-    if not path.exists():
-        os.makedirs(path)
+    in_path = pathlib.Path("data")
+    if not in_path.exists():
+        os.makedirs(in_path)
 
-    path = pathlib.Path(path, f"{dataset_file.replace('.csv.gz','.parquet')}")
-    df.to_parquet(path, compression="gzip")
+    filename = f"{dataset_file.replace('.csv.gz','.parquet')}"
 
-    return path
+    df.to_parquet(pathlib.Path(in_path, filename), compression="gzip")
+
+    return in_path, filename
 
 
 @task(name="Write Data on GCS", log_prints=True)
-def write_GCS(path: pathlib.Path) -> None:
+def write_GCS(in_path: pathlib.Path, out_path: pathlib.Path, filename: str) -> None:
     """Copy the Parquet file to GCS"""
 
+    in_path_file = pathlib.Path(in_path, filename)
+    out_path_file = pathlib.Path(out_path, filename)
+
     gcs_block = GcsBucket.load("ny-taxi-gcs-bucket")
-    gcs_block.upload_from_path(from_path=path, to_path=path)
+    gcs_block.upload_from_path(from_path=in_path_file, to_path=out_path_file)
 
 
 @flow(log_prints=True, retries=3)
@@ -80,8 +84,9 @@ def etl_web_to_gcs(year: int, month: int, color: str) -> None:
 
     df = fetch(dataset_url)
     df_clean = transform_data(df)
-    path = write_local(df_clean, dataset_file)
-    write_GCS(path)
+    in_path, filename = write_local(df_clean, dataset_file)
+    out_path = pathlib.Path('homework')
+    write_GCS(in_path, out_path, filename)
 
 
 @flow(log_prints=True)

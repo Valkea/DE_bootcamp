@@ -159,4 +159,71 @@ Using the Orion GUI, add a "Quick run" on the deployment. It will appear as sche
 >>> prefect agent start --work-queue "default"
 
 
-### Deployment using terminal commands
+
+## Full deployment using terminal commands
+We can also set the **cronjob** (--cron) and **apply** (-a) when **building**
+>>> prefect deployment build ./etl_web_to_gcs.py:etl_parent_flow -n "Parameterized ETL" --cron "*/5 * * * *" -a
+
+# --------------------------------------------------------------
+# Deploy pipeline using PREFECT and Docker
+
+## Add a docker-requirements.txt file with the libs needed for the docker image
+
+## Add a Dockerfile with the following content
+
+> **********
+> #FROM prefecthq/prefect:2.7.7-python3.9 
+> 
+> COPY docker-requirements.txt .
+> 
+> RUN pip install -r docker-requirements.txt --trusted-host pypi.python.org --no-cache-dir
+> 
+> # copy the current folder with scripts & data
+> COPY ./* /opt/prefect/ 
+> 
+> # No need to add ENTRYPOINT or CMD
+> **********
+
+## Create & tag the docker image
+
+>>> docker build -t valkea/prefect:v1 .
+
+## Push the docker image to the DockerHub
+
+>>> docker push valkea/prefect:v1
+
+## Add PREFECT Docker Block
+
+### PREFECT-GUI ## "Blocks" / "Add Block" / "Docker Container"
+
+name ---> ny-taxi-docker
+image ---> valkea/prefect:v1
+ImagePullPolicy ---> ALWAYS
+AutoRemove ---> True (just to keep the machine cleaner)
+---> click CREATE
+
+## Create a docker_deploy.py
+
+---> Paste the code given by the Docker Block
+---> See file docker_deploy.py content
+
+## Install the docker deployment into the local PREFECT
+
+>>> prefect config set PREFECT_API_URL="http://127.0.0.1:4200/api"
+
+(alternatively we can use Prefect Cloud or any other url)
+(and if needed we can unset this with : prefect config unset PREFECT_API_URL ) 
+
+>>> python docker_deploy.py
+
+## Run the deployement
+
+---> use the "Quick run" or "Custom run" button in the GUI
+
+OR
+
+>>> prefect deployment run etl-parent-flow/docker-flow
+
+OR with extra paremeters
+
+>>> prefect deployment run etl-parent-flow/docker-flow -p "months=[1,2]"

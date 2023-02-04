@@ -1,0 +1,7 @@
+pandas==1.5.2
+# prefect==2.7.7 # already part of the source image
+# prefect-sqlalchemy==0.2.2 # no need for SQL alchemy here
+prefect-gcp[cloud_storage]==0.2.3
+protobuf==4.21.11
+pyarrow==10.0.1
+# pandas-gbq==0.18.1 # no need for BigQuery here

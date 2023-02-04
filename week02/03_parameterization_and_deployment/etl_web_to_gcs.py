@@ -10,7 +10,6 @@ from prefect_gcp.cloud_storage import GcsBucket
 from prefect.tasks import task_input_hash
 
 
-
 @task(
     name="Extract Data",
     log_prints=True,
@@ -19,7 +18,7 @@ from prefect.tasks import task_input_hash
     cache_expiration=timedelta(days=1),
 )
 def fetch(dataset_url: str) -> pd.DataFrame:
-    """ Read data from web into pandas DataFrame """
+    """Read data from web into pandas DataFrame"""
 
     print("FETCH", dataset_url)
     return pd.read_csv(dataset_url)
@@ -44,7 +43,7 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
 
 @task(name="Write Data Locally", log_prints=True)
 def write_local(df: pd.DataFrame, dataset_file: str) -> pathlib.Path:
-    """ Write the DataFrame out locally as a Parquet file """
+    """Write the DataFrame out locally as a Parquet file"""
 
     path = pathlib.Path("data")
     if not path.exists():
@@ -58,15 +57,15 @@ def write_local(df: pd.DataFrame, dataset_file: str) -> pathlib.Path:
 
 @task(name="Write Data on GCS", log_prints=True)
 def write_GCS(path: pathlib.Path) -> None:
-    """ Copy the Parquet file to GCS"""
+    """Copy the Parquet file to GCS"""
 
     gcs_block = GcsBucket.load("ny-taxi-gcs-bucket")
     gcs_block.upload_from_path(from_path=path, to_path=path)
 
 
 @flow(log_prints=True, retries=3)
-def etl_web_to_gcs(year:int, month:int, color:str) -> None:
-    """ The main ETL function """
+def etl_web_to_gcs(year: int, month: int, color: str) -> None:
+    """The main ETL function"""
 
     dataset_file = f"{color}_tripdata_{year}-{month:02}.csv.gz"
     dataset_url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{color}/{dataset_file}"
@@ -78,14 +77,17 @@ def etl_web_to_gcs(year:int, month:int, color:str) -> None:
 
 
 @flow(log_prints=True)
-def etl_parent_flow(year:int = 2020, months:list = [1,2], color:str = "yellow") -> None:
-    """ The main function """
+def etl_parent_flow(
+    year: int = 2020, months: list = [1, 2], color: str = "yellow"
+) -> None:
+    """The main function"""
     for month in months:
         print(f"ETL for year:{year} month:{month} color:{color}")
         etl_web_to_gcs(year, month, color)
 
+
 if __name__ == "__main__":
-    year=2020
-    months=[1,2,3]
-    color="green"
+    year = 2020
+    months = [1, 2, 3]
+    color = "green"
     etl_parent_flow(year, months, color)

@@ -27,7 +27,7 @@ infrastructure:
 flow_name: etl-parent-flow
 manifest_path: null
 storage: null
-path: /home/valkea/Dev/Cours_DE_bootcamp/week02/03_parameterization
+path: /home/valkea/Dev/Cours_DE_bootcamp/week02/03_parameterization_and_deployment
 entrypoint: etl_web_to_gcs.py:etl_parent_flow
 parameter_openapi_schema:
   title: Parameters

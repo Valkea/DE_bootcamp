@@ -30,8 +30,12 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     print(df.head(2))
 
     print(f"pre: columns types: \n{df.dtypes}")
-    df.lpep_pickup_datetime = pd.to_datetime(df.lpep_pickup_datetime)
-    df.lpep_dropoff_datetime = pd.to_datetime(df.lpep_dropoff_datetime)
+    if "lpep_pickup_datetime" in df.columns:
+        df.lpep_pickup_datetime = pd.to_datetime(df.lpep_pickup_datetime)
+        df.lpep_dropoff_datetime = pd.to_datetime(df.lpep_dropoff_datetime)
+    elif "tpep_pickup_datetime" in df.columns:
+        df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
+        df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
     print(f"post: columns types: \n{df.dtypes}")
 
     # print(f"pre: missing passenger count: {df[df.passenger_count == 0].shape[0]} / {df.shape[0]}")

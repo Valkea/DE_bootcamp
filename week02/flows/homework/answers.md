@@ -1,6 +1,7 @@
 # Question 1. Load `January` `2020` `Green` data
 
 > Using the **etl_web_to_gcs.py** flow that loads taxi data into GCS as a guide, create a flow that loads the **green** taxi CSV dataset for **January 2020** into GCS and run it. Look at the logs to find out how many rows the dataset has.
+> 
 > How many rows does that dataset have?
 
 >>> python etl_web_to_gcs.py --year 2020 --months 1 --color green
@@ -11,7 +12,9 @@
 # Question 2. Scheduling with Cron
 
 > Cron is a common scheduling specification for workflows.
-> Using the flow in etl_web_to_gcs.py, create a deployment to run on the **first of every month at 5am UTC**. What’s the cron schedule for that?
+> Using the flow in etl_web_to_gcs.py, create a deployment to run on the **first of every month at 5am UTC**.
+>
+> What’s the cron schedule for that?
 
 The format is : *minute hours days month year*
 
@@ -25,7 +28,9 @@ The format is : *minute hours days month year*
 > Make any other necessary changes to the code for it to function as required.
 > **Create a deployment** for this flow to run in a **local subprocess** with **local flow code storage** (the defaults).
 > Make sure you have the parquet data files for **Yellow** taxi data for **Feb. 2019** and **March 2019** loaded in GCS.
-> Run your deployment to append this data to your BiqQuery table. How many rows did your flow code process?
+> Run your deployment to append this data to your BiqQuery table.
+>
+> How many rows did your flow code process?
 
 ## Grab the requested datasets and push them to the GCS
 >>> python flows/homework/etl_web_to_gcs.py --year 2019 --months 2 3 --color yellow
@@ -62,3 +67,14 @@ Then let's use the modified etl_gcs_to_bq.py
 Row 14851920
 
 > So the answer is **14851920** again
+
+
+# Question 6. Secrets
+
+> Prefect Secret blocks provide secure, encrypted storage in the database and obfuscation in the UI. Create a secret block in the UI that stores a fake 10-digit password to connect to a third-party service.
+>
+> Once you’ve created your block in the UI, how many characters are shown as asterisks (*) on the next page of the UI?
+
+### PREFECT-GUI ## "Blocks" / "Add Block" / "Secret"
+--> input: 1234567890
+******** --> **8**

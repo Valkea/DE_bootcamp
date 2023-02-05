@@ -138,6 +138,43 @@ repository --> https://github.com/Valkea/DE_bootcamp/tree/main/week02/flows/04_d
 
 > So the answer is : **514392**
 
+## Let's try the PREFECT Cloud
+
+### Create a PREFECT cloud account
+
+### Duplicate the GCP Creds and GCP Bucket blocks on the cloud
+
+### Login from local terminal 
+>>> prefect cloud login
+
+### Install the GitHub Blocks
+
+#### Using a script
+>>> python github_block.py
+
+#### OR Using the Orion's ## "Blocks" / "Add Block" / "GitHub"
+name ---> ny-taxi-github
+repository --> https://github.com/Valkea/DE_bootcamp/tree/main/week02/flows/04_dockerization_and_deployment
+---> click CREATE
+
+### Add an email block for notifications
+
+### Add a notification alert using the "Automation" section
+
+### Create a new RUN 
+
+#### Using the Orion's UI (Quick Run / Custom Run)
+#### OR Using a command line
+>>> prefect deployment run etl-parent-flow/github-flow
+
+### Start an Agent (the cloud needs a local agent, it won't run the agent alone)
+>>> prefect agent start --work-queue "default" 
+
+### Logout from the cloud
+>>> prefect cloud logout
+
+### Now the deployment will execute and send the notifications depending on the settings
+
 # Question 6. Secrets
 
 > Prefect Secret blocks provide secure, encrypted storage in the database and obfuscation in the UI. Create a secret block in the UI that stores a fake 10-digit password to connect to a third-party service.

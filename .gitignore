@@ -5,3 +5,4 @@ week01/terraform/gcp-passkey.json
 *.ipynb_checkpoints
 venvWeek02
 venv
+.prefectignore

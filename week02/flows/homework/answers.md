@@ -68,6 +68,75 @@ Row 14851920
 
 > So the answer is **14851920** again
 
+# Question 4. Github Storage Block
+
+> Using the **etl_web_to_gcs** script from the videos as a guide, you want to **store your flow code in a GitHub repository** for collaboration with your team. Prefect can look in the GitHub repo to find your flow code and read it.
+> **Create a GitHub storage block** from the UI or in Python code and use that in your Deployment instead of storing your flow code locally or baking your flow code into a Docker image.
+> Note that you will have to push your code to GitHub, Prefect will not push it for you.
+> Run your deployment in a **local subprocess** (the default if you don’t specify an infrastructure). Use the **Green** taxi data for the month of **November 2020**.
+> 
+> How many rows were processed by the script?
+
+> You need to create a GitHub repo and push all the files your flow needs to it. Then create your GitHub storage block that references that repo. Then build your deployment that specifies the storage block to use. Does that help?
+
+## Grab the requested datasets and push them to the GCS
+>>> python flows/homework/etl_web_to_gcs.py --year 2020 --months 11 --color green
+| INFO    | Task run 'Transform Data-7a5e1946-0' - row count: 88605
+
+> So the answer is : 7019375+7832545 = **88605**
+
+
+### Let's install the GibHub Block
+
+>>> pip install prefect-github
+>>> prefect block register -m prefect_github
+
+
+
+### Create the GitHub Block
+
+#### Using a script
+>>> python github_block.py
+
+#### OR Using the Orion's ## "Blocks" / "Add Block" / "GitHub"
+name ---> ny-taxi-github
+repository --> https://github.com/Valkea/DE_bootcamp/tree/main/week02/flows/04_dockerization_and_deployment
+---> click CREATE
+
+### Push the target folder (homework) and target script (etl_web_to_gcs.py) to GitHub
+
+### Create a PREFECT deployment
+
+#### Using a script
+>>> python guthub_deploy.py
+
+#### OR Using a comand line
+>>> prefect deployment build week02/flows/homework/etl_web_to_gcs.py:etl_parent_flow --name github-flow --tag dev -sb github/ny-taxi-github -a
+
+### Create a new RUN 
+
+#### Using the Orion's UI (Quick Run / Custom Run)
+#### OR Using a command line
+>>> prefect deployment run etl-parent-flow/github-flow
+
+`/!\ We can rename the etl_web_togcs.py local script to ensure that the Github version is really used !`
+
+# Question 5. Email or Slack notifications
+
+> It’s often helpful to be notified when something with your dataflow doesn’t work as planned. Choose one of the options below for creating email or slack notifications.
+> The hosted Prefect Cloud lets you avoid running your own server and has Automations that allow you to get notifications when certain events occur or don’t occur.
+> Create a free forever Prefect Cloud account at app.prefect.cloud and connect your workspace to it following the steps in the UI when you sign up.
+> Set up an Automation that will send yourself an email when a flow run completes. Run the deployment used in Q4 for the **Green** taxi data for **April 2019**. Check your email to see the notification.
+> Alternatively, use a Prefect Cloud Automation or a self-hosted Orion server Notification to get notifications in a Slack workspace via an incoming webhook.
+> You can grab the webhook URL from your own Slack workspace and Slack App that you create.
+> 
+> How many rows were processed by the script?
+
+## Grab the requested datasets and push them to the GCS
+>>> python flows/homework/etl_web_to_gcs.py --year 2019 --months 4 --color green
+| INFO    | Task run 'Transform Data-7a5e1946-0' - row count: 514392
+
+> So the answer is : **514392**
 
 # Question 6. Secrets
 

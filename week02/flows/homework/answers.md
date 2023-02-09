@@ -18,7 +18,7 @@
 
 The format is : *minute hours days month year*
 
-> So the answer is -1 5 1 * *
+> So the answer is 0 5 1 * *
 
 # Question 3. Loading data to BigQuery
 

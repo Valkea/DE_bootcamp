@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: staging
+    database: lexical-passkey-375922
+    schema: homework_week4
+
+    tables:
+      - name: green_tripdata
+      - name: yellow_tripdata
+      - name: fhv_tripdata

@@ -34,6 +34,10 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   taxi_rides_ny:
 
+# We can optionally define global variables
+vars:
+ payment_type_values: [1,2,3,4,5,6]
+
 # We can optionally define the columns types of the seeds
 seeds:
   taxi_rides_ny:

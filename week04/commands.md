@@ -144,3 +144,60 @@ To run a specific project use:
 >>> python etl_gcs_to_bq.py -c yellow -y 2019 -m 1 2 3 4 5 6 7 8 9 10 11 12 -d homework_week4 -t yellow_tripdata
 >>> python etl_gcs_to_bq.py -c yellow -y 2020 -m 1 2 3 4 5 6 7 8 9 10 11 12 -d homework_week4 -t yellow_tripdata
 ``` 
+
+## Question 1:
+> What is the count of records in the model fact_trips after running all models with the test run variable disabled and filtering for 2019 and 2020 data only (pickup datetime)?
+
+```bash
+>>> SELECT COUNT(1) FROM `lexical-passkey-375922.dbt_eletremble.fact_trips` WHERE pickup_datetime BETWEEN '2019-01-01 00:00:00' AND '2020-01-01 00:00:00';
+```
+#### The answer is : **46313976**
+
+## Question 2: 
+> What is the distribution between service type filtering by years 2019 and 2020 data as done in the videos . (Yellow/Green) *
+
+#### According to the Google Data Studio dashbord, it's **89.9 / 10.1**
+
+## Question 3:
+> What is the count of records in the model stg_fhv_tripdata after running all models with the test run variable disabled
+
+```bash
+SELECT COUNT(1) FROM `lexical-passkey-375922.dbt_eletremble.stg_fhv_tripdata` WHERE true;
+```
+
+#### The answer is : **43244696**
+
+
+## Setup for Q4 and Q5
+In order to continue, we need to deploy the last changes to BQ
+
+### Push the last version to our GitHub in order to deploy in production (if we want to use production, other wise, no need to deploy)
+
+--> commit the DBT changes to the DBT branch on our Github
+--> make a pull request
+--> merge to main branch
+
+### Deploy using the DBT-UI 
+
+--> go to the "Deploy" / "Jobs" section and run the production job
+
+### Create a dashboard using Google Data Studio 
+
+--> check if the approriate table (act_fhv_trips) is in the BigQuery database
+
+## Question 4:
+> What is the count of records in the model fact_fhv_trips in 2019, after running all dependencies with the test run variable disabled 
+
+```bash
+SELECT COUNT(1) FROM `lexical-passkey-375922.dbt_eletremble.fact_fhv_trips` WHERE pickup_datetime BETWEEN '2019-01-01 00:00:00' AND '2020-01-01 00:00:00';
+```
+
+#### The answer is : **22998722**
+
+## Question 5: 
+> What is the month with the biggest amount of rides after building a tile for the fact_fhv_trips table
+> Create a dashboard with some tiles that you find interesting to explore the data. One tile should show the amount of trips per month, as done in the videos for fact_trips, based on the fact_fhv_trips table.
+
+--> see dashboard here: https://lookerstudio.google.com/reporting/5d04d288-5a15-41db-a8e3-f824ce8be571
+
+#### The answer is : **January**

@@ -18,6 +18,7 @@ trips_unioned as (
 
 dim_zones as (
     select * from {{ ref('dim_zones') }}
+    where borough != 'Unknown'
 )
 
 select

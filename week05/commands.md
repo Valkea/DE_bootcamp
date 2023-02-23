@@ -166,3 +166,31 @@ We should now see a zones folder with a parquet file inside along with a _SUCCES
 ### We can finally access the Spark Master (because we already forwarded port 4040):
 
 Go to http://localhost:4040/jobs/
+
+
+# Preparing Yellow and Green Taxi Data
+
+Let's download the data from the repository
+
+```bash
+>>> ./download_data.sh yellow 2020
+>>> ./download_data.sh yellow 2021
+>>> ./download_data.sh green 2020
+>>> ./download_data.sh green 2021
+```
+
+Then let's use the 05_taxi_schema.ipynb (from GC-VM) to split each file into 4 paquet files
+
+
+
+# Homework
+
+## Question 1. Install Spark and PySpark
+> - Install Spark
+> - Run PySpark
+> - Create a local spark session
+> - Execute spark.version
+
+> What's the output?
+
+#### The answer is **res0: String = 3.3.2**

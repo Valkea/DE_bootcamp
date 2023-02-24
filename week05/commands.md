@@ -182,6 +182,74 @@ Let's download the data from the repository
 Then let's use the 05_taxi_schema.ipynb (from GC-VM) to split each file into 4 paquet files
 
 
+# Sending data to GCS with command line (video 5.6.1)
+
+```bash
+>>> gsutil -m cp -r data/pq gs://week02_02_gcp_bucket/week5/pq
+```
+
+# Connect Spark to GCS
+
+## 1. IMPORTANT: Download the Cloud Storage connector for Hadoop here: https://cloud.google.com/dataproc/docs/concepts/connectors/cloud-storage#clusters
+(As the name imply, this .jar file is essentially what connects Spark with GCS)
+
+```bash
+>>> mkdir lib
+>>> cd lib
+>>> wget https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar
+```
+
+## 2. We must upload our GCS passkey.json file
+
+```bash
+>>> sftp de-zoocamp
+>>> cd /home/valkea
+>>> mkdir .google
+>>> cd .google
+>>> mkdir credentials
+>>> cd credentials
+>>> put lexical-passkey-375922-eec6cf60b4f3.json
+```
+
+## 3. In the python script we need to make some extra imports
+
+```
+import pyspark
+from pyspark.sql import SparkSession
+from pyspark.conf import SparkConf
+from pyspark.context import SparkContext
+```
+
+## And adapt the code...
+
+```
+credentials_location = '/home/valkea/.google/credentials/lexical-passkey-375922-eec6cf60b4f3.json'
+
+conf = SparkConf() \
+    .setMaster('local[*]') \
+    .setAppName('test') \
+    .set("spark.jars", "./lib/gcs-connector-hadoop3-latest.jar") \
+    .set("spark.hadoop.google.cloud.auth.service.account.enable", "true") \
+    .set("spark.hadoop.google.cloud.auth.service.account.json.keyfile", credentials_location)
+
+sc = SparkContext(conf=conf)
+
+hadoop_conf = sc._jsc.hadoopConfiguration()
+hadoop_conf.set("fs.AbstractFileSystem.gs.impl",  "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS")
+hadoop_conf.set("fs.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem")
+hadoop_conf.set("fs.gs.auth.service.account.json.keyfile", credentials_location)
+hadoop_conf.set("fs.gs.auth.service.account.enable", "true")
+
+spark = SparkSession.builder \
+    .config(conf=sc.getConf()) \
+    .getOrCreate()
+```
+
+Then
+
+```
+df_green = spark.read.parquet('gs://week02_02_gcp_bucket/week5/data/pq/green/*/*')
+```
 
 # Homework
 

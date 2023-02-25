@@ -251,6 +251,60 @@ Then
 df_green = spark.read.parquet('gs://week02_02_gcp_bucket/week5/data/pq/green/*/*')
 ```
 
+# Creating a local Spark Cluster & use Start-commit
+
+## Let's convert our notebook to python script
+
+Let's start the master
+```bash
+>>> cd ~/spark/spark-3.3.2-bin-hadoop3/
+>>> ./sbin/start-master.sh
+```
+
+Go to http://localhost:8080 inorder to grab the Spark Master local URL (spark://de-zoomcamp.europe-west1-b.c.lexical-passkey-375922.internal:7077)
+
+```bash
+>>> ./sbin/start-worker.sh spark://de-zoomcamp.europe-west1-b.c.lexical-passkey-375922.internal:7077
+```
+
+Now we can connect using a python script or a jupyter notebook (configured with spark://de-zoomcamp.europe-west1-b.c.lexical-passkey-375922.internal:7077)
+or check the Sparkmaster on the usual URL http://localhost:4040
+
+Let's convert the configured notebook to a python script
+
+```bash
+>>> cd ~/week_5_batch_processing/code/
+>>> jupyter nbconvert --to=script 10_use_existing_Local_Spark_Cluster.ipynb
+```
+
+Let's run the python script directly (if the ressources are not avaible, the notebook must be shut down)
+
+```bash
+>>> python 10_use_existing_Local_Spark_Cluster.py \
+    -g 'data/pq/green/2020/*/' \
+    -y 'data/pq/yellow/2020/*/' \
+    -o 'data/report/2020'
+```
+
+```bash
+>>> cd ~/week_5_batch_processing/code/
+>>> spark-submit \
+    --master='spark://de-zoomcamp.europe-west1-b.c.lexical-passkey-375922.internal:7077' \
+        10_use_existing_Local_Spark_Cluster_and_spark_submit.py \
+            -g 'data/pq/green/2020/*/' \
+            -y 'data/pq/yellow/2020/*/' \
+            -o 'data/report/2020'
+```
+
+
+Finally, once we are finished, we need to stop the worker and the master
+
+```bash
+>>> cd ~/spark/spark-3.3.2-bin-hadoop3/
+>>> ./sbin/stop-worker.sh
+>>> ./sbin/stop-master.sh
+```
+
 # Homework
 
 ## Question 1. Install Spark and PySpark

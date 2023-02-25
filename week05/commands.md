@@ -305,6 +305,68 @@ Finally, once we are finished, we need to stop the worker and the master
 >>> ./sbin/stop-master.sh
 ```
 
+# Setting up a GC-Dataproc Spark Cluster
+
+## In GC-UI search for Dataproc and ENABLE it
+
+--> CREATE CLUSTER
+
+--> Create a cluster on compute engine
+---> name: cluster-de-zoomcamp
+---> region: us-central1 (the same as the bucket we will work with)
+---> cluster type: standard
+---> components: Jupyter notebook, Docker (not required for this project, but might be useful)
+--> Config cluster specs
+--> CREATE
+
+A new VM is created for the Cluster
+
+## Let's upload the python script to the GCS bucket
+```bash
+>>> cd ~/week_5_batch_processing/code/
+>>> gsutil cp 10_use_existing_Local_Spark_Cluster_and_spark_submit.py \
+    gs://week02_02_gcp_bucket/week5/code/10_use_existing_Local_Spark_Cluster_and_spark_submit.py
+```
+ 
+## Back to the GC-DataProc page
+--> Click the cluster name
+
+--> SUBMIT JOBS
+---> job type: pyspark
+---> main python file: gs://week02_02_gcp_bucket/week5/code/10_use_existing_Local_Spark_Cluster_and_spark_submit.py
+---> arguments:
+            -g=gs://week02_02_gcp_bucket/week5/data/pq/green/2021/*/
+            -y=gs://week02_02_gcp_bucket/week5/data/pq/yellow/2021/*/
+            -o=gs://week02_02_gcp_bucket/week5/data/report/2021
+---> SUBMIT
+
+After the Job execution, we should see a new report in the Bucket
+
+
+## We can do the very same using the google cloud CLI (gsutil)
+
+First add the 'DataProc Admin' persmission to the associated IAM account
+Then:
+
+```bash
+>>> gcloud dataproc jobs submit pyspark \
+    --cluster=cluster-de-zoomcamp \
+    --region=us-central1 \
+    gs://week02_02_gcp_bucket/week5/code/10_use_existing_Local_Spark_Cluster_and_spark_submit.py \
+    -- \
+        -g=gs://week02_02_gcp_bucket/week5/data/pq/green/2021/*/ \
+        -y=gs://week02_02_gcp_bucket/week5/data/pq/yellow/2021/*/ \
+        -o=gs://week02_02_gcp_bucket/week5/data/report/2021
+```
+(We can run such a command with a cronjob, from DBT or any equivalent...)
+
+## We can also use the API calls... and many other ways (see doc)
+
+## Finally let's SHUTDOWN 
+--> the CLUSTER (on GC-DataProc page)
+--> the Virtual Machines (on the VM instances page)
+
+
 # Homework
 
 ## Question 1. Install Spark and PySpark

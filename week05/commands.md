@@ -378,3 +378,20 @@ Then:
 > What's the output?
 
 #### The answer is **res0: String = 3.3.2**
+
+## Question 2: HVFHW June 2021
+
+> - Read it with Spark using the same schema as we did in the lessons.
+> - We will use this dataset for all the remaining questions.
+> - Repartition it to 12 partitions and save it to parquet.
+
+> What is the average size of the Parquet (ending with .parquet extension) Files that were created (in MB)?
+
+Let's download the data from the repository
+
+```bash
+>>> cd ~/week_5_batch_processing/code
+>>> ./download_data.sh fhvhv 2021
+```
+
+Let's execute the Homework notebook (the answers to questions 2, 3, 4, 5, 6 are saved in the notebook)
